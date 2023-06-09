@@ -2,9 +2,9 @@
 
 Switch to English. Go to ranking page of each contest, open console and run the script in `export_ranking.js`. Rename downloads files to `ranking_r1.csv`, `ranking_r2.csv`, and `ranking_r3.csv`.
 
-- Round 1: https://oj.vnoi.info/contest/vnoicup23_r1/ranking
-- Round 2: https://oj.vnoi.info/contest/vnoicup23_r2/ranking
-- Round 3: https://oj.vnoi.info/contest/vnoicup23_r3/ranking
+- Round 1: https://oj.vnoi.info/contest/vnoicup22_r1/ranking
+- Round 2: https://oj.vnoi.info/contest/vnoicup22_r2/ranking
+- Round 3: https://oj.vnoi.info/contest/vnoicup22_r3/ranking
 
 Run `./merge_ranking` to get combined ranking of all 3 rounds.
 
@@ -13,3 +13,5 @@ Run `./get_tshirts.py` to get t-shirts winners. Seed is penalty of top 1.
 ```sh
 ./get_tshirts.py tshirt_candidates.csv 29015 > tshirt_winners.txt
 ```
+
+See https://oj.vnoi.info/post/230-dquynh_2811 for more details on how t-shirts are distributed.
