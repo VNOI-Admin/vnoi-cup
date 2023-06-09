@@ -5,6 +5,11 @@ from openpyxl.styles import PatternFill
 import numpy as np
 import pandas as pd
 
+QUALIFY_FROM_R1 = 2
+QUALIFY_FROM_R2 = 2
+QUALIFY_FROM_R3 = 2
+QUALIFY_FROM_TOTAL = 4
+
 
 def get_sec(time_str):
     h, m, s = time_str.split(':')
@@ -12,17 +17,33 @@ def get_sec(time_str):
 
 
 def main():
+    finalist = []
+
+    def check_qualify(df, to_qualify):
+        rank = 1
+        for idx, row in df.iterrows():
+            if row['Username'] in finalist:
+                df.at[idx, 'Rank'] = ''
+            else:
+                df.at[idx, 'Rank'] = rank
+                if rank <= to_qualify:
+                    finalist.append(row['Username'])
+                rank += 1
+
     r1 = pd.read_csv('ranking_r1.csv')
+    check_qualify(r1, QUALIFY_FROM_R1)
     r1['Penalty'] = r1['Penalty'].fillna('00:00:00').apply(get_sec)
     r1 = r1[[c for c in r1 if c != 'Rank'] + ['Rank']]
     r1 = r1.rename(columns={'Points': 'R1 Points', 'Penalty': 'R1 Penalty', 'Rank': 'R1 Rank'})
 
     r2 = pd.read_csv('ranking_r2.csv')
+    check_qualify(r2, QUALIFY_FROM_R2)
     r2['Penalty'] = r2['Penalty'].fillna('00:00:00').apply(get_sec)
     r2 = r2[[c for c in r2 if c != 'Rank'] + ['Rank']]
     r2 = r2.rename(columns={'Points': 'R2 Points', 'Penalty': 'R2 Penalty', 'Rank': 'R2 Rank'})
 
     r3 = pd.read_csv('ranking_r3.csv')
+    check_qualify(r3, QUALIFY_FROM_R3)
     r3['Penalty'] = r3['Penalty'].fillna('00:00:00').apply(get_sec)
     r3 = r3[[c for c in r3 if c != 'Rank'] + ['Rank']]
     r3 = r3.rename(columns={'Points': 'R3 Points', 'Penalty': 'R3 Penalty', 'Rank': 'R3 Rank'})
@@ -43,13 +64,13 @@ def main():
     total.index += 1
 
     total['Qualified'] = np.where(
-        (total['R1 Rank'] == 1) | (total['R1 Rank'] == 2) | (total['R2 Rank'] == 1) | (total['R2 Rank'] == 2) |
-        (total['R3 Rank'] == 1) | (total['R3 Rank'] == 2),
+        (total['R1 Rank'].isin(range(1, QUALIFY_FROM_R1 + 1))) |
+        (total['R2 Rank'].isin(range(1, QUALIFY_FROM_R2 + 1))) | (total['R3 Rank'].isin(range(1, QUALIFY_FROM_R3 + 1))),
         'x',
         '',
     )
 
-    remaining_slots = 4
+    remaining_slots = QUALIFY_FROM_TOTAL
     for idx, row in total.iterrows():
         if row['Qualified'] == '':
             total.at[idx, 'Qualified'] = 'x'
