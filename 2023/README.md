@@ -11,5 +11,5 @@ Run `./merge_ranking` to get combined ranking of all 3 rounds.
 Run `./get_tshirts.py` to get t-shirts winners. Seed is penalty of top 1.
 
 ```sh
-./get_tshirts.py tshirt_candidates.csv ??? > tshirt_winners.txt
+./get_tshirts.py tshirt_candidates.csv 36105 > tshirt_winners.txt
 ```
