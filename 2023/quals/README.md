@@ -1,4 +1,4 @@
-# VNOI Cup 2023
+# VNOI Cup 2023 Qualification Rounds
 
 Switch to English. Go to ranking page of each contest, open console and run the script in `export_ranking.js`. Rename downloads files to `ranking_r1.csv`, `ranking_r2.csv`, and `ranking_r3.csv`.
 
