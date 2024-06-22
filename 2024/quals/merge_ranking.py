@@ -5,10 +5,35 @@ from openpyxl.styles import PatternFill
 import numpy as np
 import pandas as pd
 
-QUALIFY_FROM_R1 = 2
-QUALIFY_FROM_R2 = 2
-QUALIFY_FROM_R3 = 3
-QUALIFY_FROM_TOTAL = 3
+QUALIFY_FROM_R1 = 3
+QUALIFY_FROM_R2 = 3
+
+QUALIFIED = [
+    "LeKienThanh69",
+    "neko_nyaaaaaaaaaaaaaaaaaaaaaaa",
+    "chemthan",
+    "flashmt",
+    "kilkuwu",
+    "hoangxuanbach",
+    "cuom1999",
+    "khanhphucscratch",
+    "toib",
+    "tungvh04",
+    "Pannda",
+    "tuanlinh17032006",
+    "DeMen100ns",
+    "powder",
+    "duongnc000",
+    "fextivity",
+    "gawr_gura",
+    "marvinthang",
+    "minhcool",
+    "socpite",
+    "noobcoder",
+    "6aren",
+    "hollwo_pelw",
+    "Yurushia",
+]
 
 
 def get_sec(time_str):
@@ -46,26 +71,13 @@ def main():
         columns={"Points": "R2 Points", "Penalty": "R2 Penalty", "Rank": "R2 Rank"}
     )
 
-    r3 = pd.read_csv("ranking_r3.csv")
-    check_qualify(r3, QUALIFY_FROM_R3)
-    r3["Penalty"] = r3["Penalty"].fillna("00:00:00").apply(get_sec)
-    r3 = r3[[c for c in r3 if c != "Rank"] + ["Rank"]]
-    r3 = r3.rename(
-        columns={"Points": "R3 Points", "Penalty": "R3 Penalty", "Rank": "R3 Rank"}
-    )
-
     total = r1.merge(r2, on=["Username", "Full Name"], how="outer")
-    total = total.merge(r3, on=["Username", "Full Name"], how="outer")
     total["R1 Points"] = total["R1 Points"].fillna(0)
     total["R2 Points"] = total["R2 Points"].fillna(0)
-    total["R3 Points"] = total["R3 Points"].fillna(0)
     total["R1 Penalty"] = total["R1 Penalty"].fillna(0)
     total["R2 Penalty"] = total["R2 Penalty"].fillna(0)
-    total["R3 Penalty"] = total["R3 Penalty"].fillna(0)
-    total["Total Points"] = total["R1 Points"] + total["R2 Points"] + total["R3 Points"]
-    total["Total Penalty"] = (
-        total["R1 Penalty"] + total["R2 Penalty"] + total["R3 Penalty"]
-    )
+    total["Total Points"] = total["R1 Points"] + total["R2 Points"]
+    total["Total Penalty"] = total["R1 Penalty"] + total["R2 Penalty"]
     total = total.sort_values(
         by=["Total Points", "Total Penalty"], ascending=[False, True]
     )
@@ -73,22 +85,10 @@ def main():
     total.index.name = "Rank"
     total.index += 1
 
-    total["Qualified"] = np.where(
-        (total["R1 Rank"].isin(range(1, QUALIFY_FROM_R1 + 1)))
-        | (total["R2 Rank"].isin(range(1, QUALIFY_FROM_R2 + 1)))
-        | (total["R3 Rank"].isin(range(1, QUALIFY_FROM_R3 + 1))),
-        "x",
-        "",
-    )
-
-    remaining_slots = QUALIFY_FROM_TOTAL
+    total["Qualified"] = ""
     for idx, row in total.iterrows():
-        if row["Qualified"] == "":
+        if row["Username"] in QUALIFIED:
             total.at[idx, "Qualified"] = "x"
-            remaining_slots -= 1
-
-        if remaining_slots == 0:
-            break
 
     column_names = [
         "Username",
@@ -105,7 +105,7 @@ def main():
     total.to_excel("total.xlsx")
 
     keep_columns = ["Username", "Total Points"]
-    tshirt_candidates = total[total["Qualified"] == ""]
+    tshirt_candidates = total[(total["Qualified"] == "") & (total["Total Points"] > 0)]
     tshirt_candidates = tshirt_candidates.drop(
         columns=[c for c in tshirt_candidates if c not in keep_columns]
     )
